@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orenda/views/register_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -145,7 +146,14 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Register(),
+                              ),
+                            );
+                          },
                           child: const Text(
                             'Sign up',
                             style: TextStyle(
