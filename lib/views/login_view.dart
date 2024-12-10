@@ -35,6 +35,11 @@ class _LoginState extends State<Login> {
                     const TextField(
                       decoration: InputDecoration(
                         labelText: 'Email',
+                        labelStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF565657),
+                        ),
                         prefixIcon: Icon(
                           Icons.email,
                           size: 20,
@@ -190,6 +195,11 @@ class _PasswordFieldState extends State<PasswordField> {
       obscureText: _isObscure,
       decoration: InputDecoration(
         labelText: 'Password',
+        labelStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFF565657),
+        ),
         prefixIcon: const Icon(
           Icons.lock,
           size: 20,
