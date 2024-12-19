@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:orenda/views/bottom_navigation/bottom_navigation_view.dart';
 import 'package:orenda/views/register_view.dart';
-import 'package:orenda/views/waiter_dashboard_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const WaiterDashboard(),
+                            builder: (context) => const BottomNavigation(),
                           ),
                         );
                       },
