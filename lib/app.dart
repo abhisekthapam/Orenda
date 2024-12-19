@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:orenda/views/onboarding_screen_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orenda/views/login_view.dart';
+import 'package:orenda/views/onboarding_screen_view.dart';
+import 'package:orenda/views/theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AppStarter(),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider()..loadTheme(),
+      child: const AppStarter(),
     );
   }
 }
@@ -38,6 +40,10 @@ class _AppStarterState extends State<AppStarter> {
     setState(() {
       _firstLaunch = firstLaunch;
     });
+
+    if (firstLaunch) {
+      prefs.setBool('firstLaunch', false);
+    }
   }
 
   @override
@@ -48,6 +54,18 @@ class _AppStarterState extends State<AppStarter> {
       );
     }
 
-    return _firstLaunch! ? const OnboardingScreen() : const Login();
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        final ThemeData theme = themeProvider.isDarkMode
+            ? ThemeData.dark().copyWith(primaryColor: Colors.deepPurple)
+            : ThemeData.light().copyWith(primaryColor: Colors.blue);
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          home: _firstLaunch! ? const OnboardingScreen() : const Login(),
+        );
+      },
+    );
   }
 }

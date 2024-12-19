@@ -42,6 +42,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: SafeArea(
         child: PageView(
@@ -60,8 +61,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
           : BottomNavigationBar(
               currentIndex: _currentIndex - 1,
               onTap: _onBottomNavTap,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.grey,
+              selectedItemColor: isDarkMode ? Colors.white : Colors.black,
+              unselectedItemColor: Colors.grey[600],
               type: BottomNavigationBarType.fixed,
               items: const [
                 BottomNavigationBarItem(

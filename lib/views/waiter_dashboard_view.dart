@@ -1,141 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:orenda/views/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-class WaiterDashboard extends StatefulWidget {
+class WaiterDashboard extends StatelessWidget {
   const WaiterDashboard({super.key});
 
   @override
-  _WaiterDashboardState createState() => _WaiterDashboardState();
-}
-
-class _WaiterDashboardState extends State<WaiterDashboard> {
-  bool isDarkMode = false;
-  bool isBiometricAuthEnabled = true;
-  bool areNotificationsEnabled = false;
-
-  final Color primaryColor = const Color(0xFF565657);
-
-  @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       backgroundColor:
-          isDarkMode ? primaryColor.withOpacity(0.8) : Colors.white,
+          themeProvider.isDarkMode ? Colors.grey[900] : Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Stack(
-                children: [
-                  Container(
-                    height: 400,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/waiter.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withOpacity(0.6),
-                            Colors.transparent,
-                          ],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    bottom: 20,
-                    left: 16,
-                    right: 16,
-                    child: Column(
-                      children: [
-                        Text(
-                          'Abhisek Magar',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          'Senior Waiter',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Service Statistics',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    buildStatisticRow('Tables Served', '1066'),
-                    buildStatisticRow('Joined Date', '2022/06/06'),
-                    buildStatisticRow('Experience', '2 Years'),
-                    buildStatisticRow('Employment', 'Full-time'),
-                  ],
-                ),
-              ),
+              _buildHeader(context),
+              _buildStatisticsSection(themeProvider),
               const Divider(thickness: 1),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 22.0, horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    buildToggleRow(
-                      'Dark Mode',
-                      isDarkMode,
-                      (newValue) => setState(() {
-                        isDarkMode = newValue;
-                      }),
-                    ),
-                    buildToggleRow(
-                      'Biometric Auth',
-                      isBiometricAuthEnabled,
-                      (newValue) => setState(() {
-                        isBiometricAuthEnabled = newValue;
-                      }),
-                    ),
-                    buildToggleRow(
-                      'Notifications',
-                      areNotificationsEnabled,
-                      (newValue) => setState(() {
-                        areNotificationsEnabled = newValue;
-                      }),
-                    ),
-                  ],
-                ),
-              ),
+              _buildSettingsSection(themeProvider, context),
             ],
           ),
         ),
@@ -143,7 +27,137 @@ class _WaiterDashboardState extends State<WaiterDashboard> {
     );
   }
 
-  Widget buildStatisticRow(String label, String value) {
+  Widget _buildHeader(BuildContext context) {
+    return Stack(
+      children: [
+        Container(
+          height: 400,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/waiter.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.black.withOpacity(0.5),
+                  Colors.transparent,
+                ],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ),
+            ),
+          ),
+        ),
+        const Positioned(
+          bottom: 20,
+          left: 16,
+          right: 16,
+          child: Column(
+            children: [
+              Text(
+                'Abhisek Magar',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                'Senior Waiter',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatisticsSection(ThemeProvider themeProvider) {
+    final TextStyle labelStyle =
+        themeProvider.getTextStyle(fontSize: 16, isBold: false);
+    final TextStyle valueStyle =
+        themeProvider.getTextStyle(fontSize: 16, isBold: true);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Service Statistics',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: labelStyle.color,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _buildStatisticRow('Tables Served', '1066', labelStyle, valueStyle),
+          _buildStatisticRow(
+              'Joined Date', '2022/06/06', labelStyle, valueStyle),
+          _buildStatisticRow('Experience', '2 Years', labelStyle, valueStyle),
+          _buildStatisticRow('Employment', 'Full-time', labelStyle, valueStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection(
+      ThemeProvider themeProvider, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Settings',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _buildToggleRow(
+            'Dark Mode',
+            themeProvider.isDarkMode,
+            (newValue) {
+              themeProvider.toggleTheme();
+            },
+            themeProvider.isDarkMode,
+          ),
+          _buildToggleRow(
+            'Biometric Auth',
+            true,
+            (newValue) {},
+            themeProvider.isDarkMode,
+          ),
+          _buildToggleRow(
+            'Notifications',
+            false,
+            (newValue) {},
+            themeProvider.isDarkMode,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatisticRow(
+    String label,
+    String value,
+    TextStyle labelStyle,
+    TextStyle valueStyle,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
@@ -151,26 +165,19 @@ class _WaiterDashboardState extends State<WaiterDashboard> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 16,
-              color: isDarkMode ? Colors.white : primaryColor,
-            ),
+            style: labelStyle,
           ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : primaryColor,
-            ),
+            style: valueStyle,
           ),
         ],
       ),
     );
   }
 
-  Widget buildToggleRow(
-      String label, bool currentValue, ValueChanged<bool> onChanged) {
+  Widget _buildToggleRow(String label, bool currentValue,
+      ValueChanged<bool> onChanged, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -179,17 +186,15 @@ class _WaiterDashboardState extends State<WaiterDashboard> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
-              color: isDarkMode ? Colors.white : primaryColor,
-            ),
+                fontSize: 16, color: isDarkMode ? Colors.white : Colors.black),
           ),
           Switch(
             value: currentValue,
             onChanged: onChanged,
-            activeColor: primaryColor,
-            activeTrackColor: primaryColor.withOpacity(0.5),
-            inactiveThumbColor: primaryColor.withOpacity(0.7),
-            inactiveTrackColor: primaryColor.withOpacity(0.3),
+            activeColor: Colors.grey[600],
+            activeTrackColor: Colors.grey[800],
+            inactiveThumbColor: Colors.grey.withOpacity(0.7),
+            inactiveTrackColor: Colors.grey.withOpacity(0.3),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
