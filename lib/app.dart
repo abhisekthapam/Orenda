@@ -57,8 +57,28 @@ class _AppStarterState extends State<AppStarter> {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         final ThemeData theme = themeProvider.isDarkMode
-            ? ThemeData.dark().copyWith(primaryColor: Colors.deepPurple)
-            : ThemeData.light().copyWith(primaryColor: Colors.blue);
+            ? ThemeData.dark().copyWith(
+                primaryColor: Colors.white,
+                textTheme: const TextTheme(
+                  bodyLarge: TextStyle(
+                    fontFamily: 'Roboto Regular',
+                  ),
+                  bodyMedium: TextStyle(
+                    fontFamily: 'Roboto Regular',
+                  ),
+                ),
+              )
+            : ThemeData.light().copyWith(
+                primaryColor: Colors.black,
+                textTheme: const TextTheme(
+                  bodyLarge: TextStyle(
+                    fontFamily: 'Roboto Regular',
+                  ),
+                  bodyMedium: TextStyle(
+                    fontFamily: 'Roboto Regular',
+                  ),
+                ),
+              );
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,

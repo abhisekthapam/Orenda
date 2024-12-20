@@ -14,10 +14,14 @@ class Register extends StatelessWidget {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/images/login-pic.jpg',
-                    height: 250,
+                    MediaQuery.of(context).size.width < 600
+                        ? 'assets/images/login-pic.jpg'
+                        : Theme.of(context).brightness == Brightness.dark
+                            ? 'assets/images/dark-theme-logo.jpg'
+                            : 'assets/images/light-theme-logo.jpg',
+                    height: MediaQuery.of(context).size.width < 600 ? 270 : 170,
                     width: double.infinity,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                 ],
               ),
@@ -119,11 +123,11 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.icon,
     this.isPassword = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -154,10 +158,10 @@ class PasswordTextField extends StatefulWidget {
   final IconData icon;
 
   const PasswordTextField({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   _PasswordTextFieldState createState() => _PasswordTextFieldState();

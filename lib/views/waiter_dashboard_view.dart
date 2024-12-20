@@ -28,14 +28,17 @@ class WaiterDashboard extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Stack(
       children: [
         Container(
-          height: 400,
+          height: screenWidth > 600 ? screenHeight * 0.8 : screenHeight * 0.49,
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/waiter.jpg'),
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
           ),
         ),

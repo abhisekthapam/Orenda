@@ -21,10 +21,16 @@ class _LoginState extends State<Login> {
             children: [
               SizedBox(
                 width: double.infinity,
-                height: 300,
+                height: MediaQuery.of(context).size.width < 600
+                    ? MediaQuery.of(context).size.height * 0.35
+                    : MediaQuery.of(context).size.height * 0.3,
                 child: Image.asset(
-                  'assets/images/login-pic.jpg',
-                  fit: BoxFit.cover,
+                  MediaQuery.of(context).size.width < 600
+                      ? 'assets/images/login-pic.jpg'
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? 'assets/images/dark-theme-logo.jpg'
+                          : 'assets/images/light-theme-logo.jpg',
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 30),
