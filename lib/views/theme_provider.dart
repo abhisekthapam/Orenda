@@ -29,6 +29,7 @@ class ThemeProvider with ChangeNotifier {
 
   TextStyle getTextStyle({required double fontSize, required bool isBold}) {
     return TextStyle(
+      fontFamily: 'Roboto Regular',
       fontSize: fontSize,
       fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
       color: _isDarkMode ? Colors.white : Colors.black,
