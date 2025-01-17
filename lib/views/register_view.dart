@@ -1,8 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:orenda/database/models/user_model.dart';
 import 'package:orenda/views/login_view.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
   const Register({super.key});
+
+  @override
+  _RegisterState createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  void registerUser() async {
+    final fullName = nameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+    final phone = phoneController.text.trim();
+
+    if (fullName.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all the fields!')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match!')),
+      );
+      return;
+    }
+
+    final user = UserModel(
+      fullName: fullName,
+      email: email,
+      password: password,
+      phone: phone,
+    );
+
+    // await HiveDatabase.addUser(user);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Registration Successful!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,27 +102,32 @@ class Register extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 6),
-                    const CustomTextField(
+                    CustomTextField(
+                      controller: nameController,
                       labelText: 'Full Name',
                       icon: Icons.person,
                     ),
                     const SizedBox(height: 15),
-                    const CustomTextField(
+                    CustomTextField(
+                      controller: emailController,
                       labelText: 'Email',
                       icon: Icons.email,
                     ),
                     const SizedBox(height: 15),
-                    const PasswordTextField(
+                    PasswordTextField(
+                      controller: passwordController,
                       labelText: 'Password',
                       icon: Icons.lock,
                     ),
                     const SizedBox(height: 15),
-                    const PasswordTextField(
+                    PasswordTextField(
+                      controller: confirmPasswordController,
                       labelText: 'Confirm Password',
                       icon: Icons.lock,
                     ),
                     const SizedBox(height: 15),
-                    const CustomTextField(
+                    CustomTextField(
+                      controller: phoneController,
                       labelText: 'Phone',
                       icon: Icons.phone,
                     ),
@@ -66,7 +142,7 @@ class Register extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: registerUser,
                         child: const Text(
                           'Sign Up',
                           style: TextStyle(
@@ -120,18 +196,21 @@ class Register extends StatelessWidget {
 class CustomTextField extends StatelessWidget {
   final String labelText;
   final IconData icon;
+  final TextEditingController controller;
   final bool isPassword;
 
   const CustomTextField({
     super.key,
     required this.labelText,
     required this.icon,
+    required this.controller,
     this.isPassword = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
       decoration: InputDecoration(
         labelText: labelText,
@@ -156,11 +235,13 @@ class CustomTextField extends StatelessWidget {
 class PasswordTextField extends StatefulWidget {
   final String labelText;
   final IconData icon;
+  final TextEditingController controller;
 
   const PasswordTextField({
     super.key,
     required this.labelText,
     required this.icon,
+    required this.controller,
   });
 
   @override
@@ -179,6 +260,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       obscureText: _isObscured,
       decoration: InputDecoration(
         labelText: widget.labelText,
