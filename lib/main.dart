@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:orenda/app.dart';
-import 'package:orenda/database/models/user_model.dart';
+import 'package:orenda/app/app.dart';
+import 'package:orenda/app/di/di.dart';
+import 'package:orenda/core/network/hive_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(UserModelAdapter());
-  runApp(const MyApp());
+  await HiveService.init();
+
+  // await HiveService().clearStudentBox();
+
+  await initDependencies();
+
+  runApp(
+    App(),
+  );
 }
