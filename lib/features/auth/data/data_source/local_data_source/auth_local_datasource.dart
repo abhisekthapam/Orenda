@@ -19,8 +19,6 @@ class AuthLocalDataSource implements IAuthDataSource {
       email: "",
       image: null,
       phone: "",
-      // batch: BatchEntity(batchName: ""),
-      // courses: [],
       username: "",
       password: "",
     ));
