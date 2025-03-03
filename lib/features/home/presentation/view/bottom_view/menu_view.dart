@@ -1,7 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:orenda/app/constants/api_endpoints.dart';
+import 'package:orenda/core/network/api_service.dart';
+import 'package:orenda/core/service_locator.dart';
 
-class MenuView extends StatelessWidget {
+class MenuView extends StatefulWidget {
   const MenuView({super.key});
+
+  @override
+  State<MenuView> createState() => _MenuViewState();
+}
+
+class _MenuViewState extends State<MenuView> {
+  final ApiService _apiService = locator<ApiService>();
+  List<Map<String, dynamic>> _products = [];
+  final Map<String, int> _cart = {};
+  bool _isLoading = true;
+  bool _hasError = false;
+
+  Widget _buildTextContent(String text) {
+    return Center(
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 18, color: Colors.white),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts();
+  }
+
+  Future<void> _fetchProducts() async {
+    try {
+      final products = await _apiService.fetchProducts();
+      setState(() {
+        _products = products
+            .map((item) => {
+                  "id": item["_id"],
+                  "name": item["name"],
+                  "description": item["description"],
+                  "price": item["price"],
+                  "image":
+                      "${ApiEndpoints.imageUrl}${item["imagePath"].split('/').last}",
+                })
+            .toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _increaseQuantity(String productId) {
+    setState(() {
+      _cart[productId] = (_cart[productId] ?? 0) + 1;
+    });
+  }
+
+  void _decreaseQuantity(String productId) {
+    setState(() {
+      if (_cart.containsKey(productId) && _cart[productId]! > 1) {
+        _cart[productId] = _cart[productId]! - 1;
+      } else {
+        _cart.remove(productId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +116,19 @@ class MenuView extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isTablet = screenWidth > 600;
-    final gridCardHeight = screenHeight * (isTablet ? 0.45 : 0.36);
+    final screenSize = MediaQuery.of(context).size;
+    final isTablet = screenSize.width > 600;
+    final gridCardHeight = screenSize.height * (isTablet ? 0.45 : 0.36);
+
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_hasError) {
+      return const Center(
+          child: Text("Failed to load products",
+              style: TextStyle(color: Colors.white)));
+    }
 
     return SingleChildScrollView(
       child: Container(
@@ -58,225 +136,21 @@ class MenuView extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                elevation: 4,
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.width > 600
-                          ? gridCardHeight * 1.52
-                          : gridCardHeight * 1,
-                      width: double.infinity,
-                      child: Image.asset(
-                        'assets/images/special.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Positioned(
-                      bottom: 16,
-                      left: 16,
-                      right: 16,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Today's Special",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            'Rich, comforting, hearty, aromatic.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: 10,
+                itemCount: _products.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: screenWidth > 600 ? 4 : 2,
+                  crossAxisCount: isTablet ? 4 : 2,
                   crossAxisSpacing: 5.0,
                   mainAxisSpacing: 5.0,
-                  childAspectRatio: screenWidth / 
-                      (gridCardHeight * (screenWidth > 600 ? 4 : 2)),
+                  childAspectRatio:
+                      screenSize.width / (gridCardHeight * (isTablet ? 4 : 2)),
                 ),
                 itemBuilder: (context, index) {
-                  final List<Map<String, dynamic>> items = [
-{
-                      "image": "assets/images/burger.jpg",
-                      "name": "Burger",
-                      "description":
-                          "Juicy, flavorful, hearty, satisfying, delicious.",
-                      "price": 250
-                    },
-                    {
-                      "image": "assets/images/steak.jpg",
-                      "name": "Steak",
-                      "description":
-                          "Tender, savory, grilled, juicy, exquisite.",
-                      "price": 1100
-                    },
-                    {
-                      "image": "assets/images/sushi.jpg",
-                      "name": "Sushi",
-                      "description":
-                          "Fresh, delicate, flavorful, artistic, refined.",
-                      "price": 750
-                    },
-                    {
-                      "image": "assets/images/ramen.jpg",
-                      "name": "Ramen",
-                      "description":
-                          "Cheesy, savory, crispy, flavorful, satisfying.",
-                      "price": 350
-                    },
-                    {
-                      "image": "assets/images/salad.jpg",
-                      "name": "Salad",
-                      "description":
-                          "Juicy, flavorful, hearty, satisfying, delicious.",
-                      "price": 550
-                    },
-                    {
-                      "image": "assets/images/sandwich.jpg",
-                      "name": "Sandwich",
-                      "description":
-                          "Tender, savory, grilled, juicy, exquisite.",
-                      "price": 200
-                    },
-                    {
-                      "image": "assets/images/spaghetti.jpg",
-                      "name": "Spaghetti",
-                      "description":
-                          "Fresh, delicate, flavorful, artistic, refined.",
-                      "price": 150
-                    },
-                    {
-                      "image": "assets/images/tacos.jpg",
-                      "name": "Tacos",
-                      "description":
-                          "Cheesy, savory, crispy, flavorful, satisfying.",
-                      "price": 350
-                    },
-                    {
-                      "image": "assets/images/soup.jpg",
-                      "name": "Soup",
-                      "description":
-                          "Cheesy, savory, crispy, flavorful, satisfying.",
-                      "price": 350
-                    },
-                    {
-                      "image": "assets/images/hotdog.jpg",
-                      "name": "Hotdog",
-                      "description":
-                          "Cheesy, savory, crispy, flavorful, satisfying.",
-                      "price": 350
-                    },
-                  ];
-
-                  final Map<String, dynamic> item = items[index];
-
-                  return Card(
-                    color: const Color.fromARGB(255, 9, 9, 9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10),
-                          ),
-                          child: Image.asset(
-                            item["image"] as String,
-                            height: isTablet ? 
-                                gridCardHeight * 0.6 : gridCardHeight * 0.5,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            item["name"] as String,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            item["description"] as String,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  "Rs. ${item["price"]}",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                padding: const EdgeInsets.all(6),
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.black,
-                                  size: 19,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _buildMenuItemCard(
+                      _products[index], isTablet, gridCardHeight);
                 },
               ),
             )
@@ -286,11 +160,132 @@ class MenuView extends StatelessWidget {
     );
   }
 
-  Widget _buildTextContent(String text) {
-    return Center(
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 18, color: Colors.white),
+  Widget _buildMenuItemCard(
+      Map<String, dynamic> item, bool isTablet, double gridCardHeight) {
+    String productId = item["id"];
+    int quantity = _cart[productId] ?? 0;
+
+    return Card(
+      color: const Color.fromARGB(255, 9, 9, 9),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Image.network(
+              item["image"] as String,
+              height: isTablet ? gridCardHeight * 0.6 : gridCardHeight * 0.5,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.error, color: Colors.red),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              item["name"] as String,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              item["description"] as String,
+              style: const TextStyle(fontSize: 12, color: Colors.white70),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Rs. ${item["price"]}",
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                quantity == 0
+                    ? GestureDetector(
+                        onTap: () => _increaseQuantity(productId),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(Icons.add,
+                              color: Colors.black, size: 20),
+                        ),
+                      )
+                    : Container(
+                        height: 35,
+                        width: 90,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 25,
+                              height: 30,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.remove,
+                                    color: Colors.black, size: 18),
+                                onPressed: () => _decreaseQuantity(productId),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 30,
+                              child: Center(
+                                child: Text(
+                                  "$quantity",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 25,
+                              height: 30,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.add,
+                                    color: Colors.black, size: 18),
+                                onPressed: () => _increaseQuantity(productId),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

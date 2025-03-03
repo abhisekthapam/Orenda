@@ -16,4 +16,9 @@ class ApiEndpoints {
   static const String imageUrl = "http://10.0.2.2:3000/uploads/";
   static const String uploadImage = "auth/uploadImage";
 
+  // ====================== Product Routes ======================
+  static const String getProducts = "products";
+
+  // ====================== Image Base URL ======================
+  static const String image = "http://10.0.2.2:3000/uploads/";
 }
