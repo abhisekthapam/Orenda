@@ -26,14 +26,15 @@ class HomeView extends StatelessWidget {
                 icon: Icon(Icons.restaurant_menu),
                 label: 'Menu',
               ),
+               BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart),
+                label: 'Cart',
+              ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.receipt_long),
                 label: 'Orders',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                label: 'Cart',
-              ),
+             
             ],
             currentIndex: state.selectedIndex,
             selectedItemColor: Colors.white,
