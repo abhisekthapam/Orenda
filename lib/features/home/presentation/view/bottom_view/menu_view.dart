@@ -72,6 +72,44 @@ class _MenuViewState extends State<MenuView> {
     });
   }
 
+  Future<void> _placeOrder() async {
+    if (_cart.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select at least one item to order."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    List<Map<String, dynamic>> orderItems = _cart.entries
+        .map((entry) => {"productId": entry.key, "quantity": entry.value})
+        .toList();
+
+    try {
+      await _apiService.placeOrder({"items": orderItems});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Order placed successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      setState(() {
+        _cart.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error placing order: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -130,33 +168,72 @@ class _MenuViewState extends State<MenuView> {
               style: TextStyle(color: Colors.white)));
     }
 
-    return SingleChildScrollView(
-      child: Container(
-        color: Colors.black,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _products.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isTablet ? 4 : 2,
-                  crossAxisSpacing: 5.0,
-                  mainAxisSpacing: 5.0,
-                  childAspectRatio:
-                      screenSize.width / (gridCardHeight * (isTablet ? 4 : 2)),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GestureDetector(
+            onTap: _placeOrder,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 18.0),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6A1B9A), Color(0xFFE91E63)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                itemBuilder: (context, index) {
-                  return _buildMenuItemCard(
-                      _products[index], isTablet, gridCardHeight);
-                },
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.pinkAccent.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            )
-          ],
+              child: const Center(
+                child: Text(
+                  'Place Order',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Container(
+              color: Colors.black,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _products.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isTablet ? 4 : 2,
+                    crossAxisSpacing: 5.0,
+                    mainAxisSpacing: 5.0,
+                    childAspectRatio: screenSize.width /
+                        (gridCardHeight * (isTablet ? 4 : 2)),
+                  ),
+                  itemBuilder: (context, index) {
+                    return _buildMenuItemCard(
+                        _products[index], isTablet, gridCardHeight);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -205,7 +282,7 @@ class _MenuViewState extends State<MenuView> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const Spacer(),
+          Spacer(),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

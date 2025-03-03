@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:orenda/app/di/di.dart';
+import 'package:orenda/features/home/presentation/view/bottom_view/cart_view.dart';
 import 'package:orenda/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:orenda/features/home/presentation/view/bottom_view/menu_view.dart';
+import 'package:orenda/features/home/presentation/view/bottom_view/order_view.dart';
 
 class HomeState extends Equatable {
   final int selectedIndex;
@@ -25,10 +26,10 @@ class HomeState extends Equatable {
           child: MenuView(),
         ),
         const Center(
-          child: Text('Orders'),
+          child: CartView(),
         ),
         const Center(
-          child: Text('Cart'),
+          child: OrderView(),
         ),
       ],
     );
