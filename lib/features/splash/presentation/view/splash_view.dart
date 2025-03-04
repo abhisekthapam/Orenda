@@ -22,34 +22,73 @@ class _SplashViewState extends State<SplashView> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF9B4DFF), 
+                  Color(0xFF6600CC), 
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 200,
-                  width: 200,
-                  child: Image.asset('assets/images/splash.gif'),
+                  height: 300, 
+                  width: 300,
+                  child: Image.asset(
+                    'assets/images/splash.gif',
+                    fit: BoxFit.contain,
+                  ),
                 ),
+                const SizedBox(height: 30),
                 const Text(
                   'Restaurant Orenda',
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                    fontFamily: 'Montserrat', 
                   ),
                 ),
-                const SizedBox(height: 10),
-                const CircularProgressIndicator(),
-                const SizedBox(height: 10),
-                const Text('version : 1.0.0')
+
+                const SizedBox(height: 20),
+
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+
+                const SizedBox(height: 20),
+                const Text(
+                  'version: 1.0.0',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                    fontFamily: 'Montserrat', 
+                  ),
+                ),
               ],
             ),
           ),
+
           Positioned(
-            bottom: 10,
+            bottom: 30,
             left: MediaQuery.of(context).size.width / 4,
             child: const Text(
               'Developed by: Abhisek Thapa Magar',
-              style: TextStyle(fontSize: 15),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white60,
+                fontStyle: FontStyle.italic,
+                fontFamily: 'Montserrat', 
+              ),
             ),
           ),
         ],
