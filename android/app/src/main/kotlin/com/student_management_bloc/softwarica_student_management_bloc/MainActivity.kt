@@ -1,5 +1,6 @@
 package com.student_management_bloc.softwarica_student_management_bloc
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity: FlutterActivity()
+class MainActivity: FlutterFragmentActivity() {
+}

@@ -14,7 +14,6 @@ class HomeState extends Equatable {
     required this.views,
   });
 
-  // Initial state
   static HomeState initial() {
     return HomeState(
       selectedIndex: 1,

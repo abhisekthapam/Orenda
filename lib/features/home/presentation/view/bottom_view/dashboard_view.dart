@@ -1,12 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DashboardView extends StatelessWidget {
+class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
+
+  @override
+  State<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+  bool isDarkMode = true;
+  bool isBiometricAuth = false;
+  bool isNotificationsEnabled = false;
+  final LocalAuthentication auth = LocalAuthentication();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isBiometricAuth = prefs.getBool('biometricAuth') ?? false;
+      isDarkMode = prefs.getBool('darkMode') ?? true;
+      isNotificationsEnabled = prefs.getBool('notificationsEnabled') ?? false;
+    });
+  }
+
+  Future<void> _savePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('biometricAuth', isBiometricAuth);
+    prefs.setBool('darkMode', isDarkMode);
+    prefs.setBool('notificationsEnabled', isNotificationsEnabled);
+  }
+
+  Future<void> _authenticate() async {
+    try {
+      bool authenticated = await auth.authenticate(
+        localizedReason: 'Authenticate using biometrics',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          useErrorDialogs: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        setState(() {
+          isBiometricAuth = true;
+        });
+        _savePreferences();
+      } else {
+        setState(() {
+          isBiometricAuth = false;
+        });
+      }
+    } catch (e) {
+      print('Biometric authentication error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Biometric authentication failed!')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -14,7 +77,7 @@ class DashboardView extends StatelessWidget {
               _buildHeader(context),
               _buildStatisticsSection(),
               const Divider(thickness: 1),
-              _buildSettingsSection(context),
+              _buildSettingsSection(),
             ],
           ),
         ),
@@ -23,104 +86,60 @@ class DashboardView extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    return Stack(
-      children: [
-        Container(
-          height: screenWidth > 600 ? screenHeight * 0.8 : screenHeight * 0.49,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/waiter.jpg'),
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.black.withOpacity(0.5),
-                  Colors.transparent,
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              ),
-            ),
-          ),
-        ),
-        const Positioned(
-          bottom: 20,
-          left: 16,
-          right: 16,
-          child: Column(
-            children: [
-              Text(
-                'Abhisek Magar',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                'Senior Waiter',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatisticsSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+      padding: const EdgeInsets.all(24.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            'Service Statistics',
+          const CircleAvatar(
+            radius: 120,
+            backgroundImage: AssetImage('assets/images/profile.jpeg'),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Abhisek Thapa',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
-          const SizedBox(height: 10),
-          _buildStatisticRow('Tables Served', '1066'),
-          _buildStatisticRow('Joined Date', '2022/06/06'),
-          _buildStatisticRow('Experience', '2 Years'),
-          _buildStatisticRow('Employment', 'Full-time'),
+          Text(
+            'Senior Waiter',
+            style: TextStyle(
+              fontSize: 16,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsSection(BuildContext context) {
+  Widget _buildStatisticsSection() {
+    List<Map<String, String>> statistics = [
+      {'label': 'Tables Served', 'value': '1066'},
+      {'label': 'Joined Date', 'value': '2022/06/06'},
+      {'label': 'Experience', 'value': '2 Years'},
+      {'label': 'Employment', 'value': 'Full-time'},
+    ];
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Settings',
+          Text(
+            'Service Statistics',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
           const SizedBox(height: 10),
-          _buildToggleRow('Dark Mode', false, (newValue) {}),
-          _buildToggleRow('Biometric Auth', true, (newValue) {}),
-          _buildToggleRow('Notifications', false, (newValue) {}),
+          ...statistics.map(
+              (stat) => _buildStatisticRow(stat['label']!, stat['value']!)),
         ],
       ),
     );
@@ -134,14 +153,15 @@ class DashboardView extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
+            style: TextStyle(
+                fontSize: 16, color: isDarkMode ? Colors.white : Colors.black),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -149,28 +169,75 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildToggleRow(
-      String label, bool currentValue, ValueChanged<bool> onChanged) {
+  Widget _buildSettingsSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
+            'Settings',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
           ),
-          Switch(
-            value: currentValue,
-            onChanged: onChanged,
-            activeColor: Colors.grey[600],
-            activeTrackColor: Colors.grey[800],
-            inactiveThumbColor: Colors.grey.withOpacity(0.7),
-            inactiveTrackColor: Colors.grey.withOpacity(0.3),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          const SizedBox(height: 10),
+          _buildSwitchTile(
+            title: 'Dark Mode',
+            value: isDarkMode,
+            onChanged: (value) {
+              setState(() {
+                isDarkMode = value;
+              });
+              _savePreferences();
+            },
+          ),
+          _buildSwitchTile(
+            title: 'Biometric Authentication',
+            value: isBiometricAuth,
+            onChanged: (value) {
+              if (value) {
+                _authenticate();
+              } else {
+                setState(() {
+                  isBiometricAuth = false;
+                });
+                _savePreferences();
+              }
+            },
+          ),
+          _buildSwitchTile(
+            title: 'Enable Notifications',
+            value: isNotificationsEnabled,
+            onChanged: (value) {
+              setState(() {
+                isNotificationsEnabled = value;
+              });
+              _savePreferences();
+            },
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSwitchTile({
+    required String title,
+    required bool value,
+    required Function(bool) onChanged,
+  }) {
+    return SwitchListTile(
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+      ),
+      value: value,
+      onChanged: onChanged,
     );
   }
 }
