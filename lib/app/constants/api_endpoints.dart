@@ -3,7 +3,10 @@ class ApiEndpoints {
 
   static const Duration connectionTimeout = Duration(seconds: 1000);
   static const Duration receiveTimeout = Duration(seconds: 1000);
-  static const String baseUrl = "http://10.0.2.2:3000/api/v1/";
+  // static const String baseUrl = "http://10.0.2.2:3000/api/v1/";
+
+  //For real device
+  static const String baseUrl = "http://192.168.1.67:3000/api/v1/";
   // For iPhone
   //static const String baseUrl = "http://localhost:3000/api/v1/";
 
@@ -13,12 +16,12 @@ class ApiEndpoints {
   static const String getAllStudent = "auth/getAllusers";
   static const String updateStudent = "auth/updateStudent/";
   static const String deleteStudent = "auth/deleteStudent/";
-  static const String imageUrl = "http://10.0.2.2:3000/uploads/";
+  static const String imageUrl = "http://192.168.1.67:3000/uploads/";
   static const String uploadImage = "auth/uploadImage";
 
   // ====================== Product Routes ======================
   static const String getProducts = "products";
 
   // ====================== Image Base URL ======================
-  static const String image = "http://10.0.2.2:3000/uploads/";
+  static const String image = "http://192.168.1.67:3000/uploads/";
 }
