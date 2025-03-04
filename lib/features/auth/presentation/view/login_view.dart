@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:local_auth/local_auth.dart'; 
 import 'package:orenda/features/auth/presentation/view/register_view.dart';
 import 'package:orenda/features/auth/presentation/view_model/login/login_bloc.dart';
 
@@ -12,9 +13,45 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController(text: '');
-  final _passwordController = TextEditingController(text: '');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _rememberMe = false;
+  final LocalAuthentication _localAuth =
+      LocalAuthentication();
+  Future<void> _authenticate() async {
+    try {
+      bool authenticated = await _localAuth.authenticate(
+        localizedReason: 'Scan your fingerprint to log in',
+        options: AuthenticationOptions(
+          stickyAuth:
+              true, 
+        ),
+      );
+
+      if (authenticated) {
+        _usernameController.text = 'abhisekthapa';
+        _passwordController.text = 'abhisekthapa';
+
+        context.read<LoginBloc>().add(
+              LoginStudentEvent(
+                context: context,
+                username: _usernameController.text,
+                password: _passwordController.text,
+              ),
+            );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Authentication failed')),
+        );
+      }
+    } catch (e) {
+      print('Error authenticating: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('An error occurred during authentication')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +70,7 @@ class _LoginViewState extends State<LoginView> {
                       style:
                           TextStyle(fontWeight: FontWeight.w600, fontSize: 30),
                     ),
-                    const SizedBox(
-                      height: 12,
-                    ),
+                    const SizedBox(height: 12),
                     Stack(
                       children: [
                         Image.asset(
@@ -52,9 +87,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 50,
-                    ),
+                    const SizedBox(height: 50),
                     TextFormField(
                       key: const ValueKey('username'),
                       controller: _usernameController,
@@ -97,9 +130,7 @@ class _LoginViewState extends State<LoginView> {
                         return null;
                       },
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       key: const ValueKey('password'),
                       controller: _passwordController,
@@ -136,12 +167,12 @@ class _LoginViewState extends State<LoginView> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      validator: ((value) {
+                      validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter password';
                         }
                         return null;
-                      }),
+                      },
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -178,9 +209,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
@@ -232,7 +261,8 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     const SizedBox(height: 25),
                     OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed:
+                          _authenticate,
                       icon: const Icon(
                         Icons.fingerprint,
                         size: 28,
@@ -265,18 +295,18 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         TextButton(
                           onPressed: () {
-                            context.read<LoginBloc>().add(
-                                  NavigateRegisterScreenEvent(
-                                    destination: RegisterView(),
-                                    context: context,
-                                  ),
-                                );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RegisterView(),
+                              ),
+                            );
                           },
                           child: const Text(
-                            'Sign up',
+                            'Sign Up',
                             style: TextStyle(
-                              color: Color(0xFF565657),
-                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
