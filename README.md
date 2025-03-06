@@ -1,6 +1,6 @@
 # Orenda
 
-[![Watch the video](https://img.youtube.com/vi/PcZU9Aa4d_4/maxresdefault.jpg)](https://youtu.be/PcZU9Aa4d_4)  
+[![Watch the video](https://img.youtube.com/vi/PcZU9Aa4d_4/maxresdefault.jpg)](https://youtu.be/PcZU9Aa4d_4)
 
 ## Screenshots
 
@@ -10,4 +10,3 @@
 ![Screenshot 4](https://github.com/user-attachments/assets/e937689e-ffa8-42dd-ac39-995eef8901c9)  
 ![Screenshot 5](https://github.com/user-attachments/assets/7c475fe2-9bca-4db1-a16b-301ced660eac)  
 ![Screenshot 6](https://github.com/user-attachments/assets/39ef401c-1be7-4256-92b1-798e860a913b)  
-
