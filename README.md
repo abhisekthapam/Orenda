@@ -1,6 +1,6 @@
 # Orenda
 
-[![Watch the video](https://img.youtube.com/vi/PcZU9Aa4d_4/maxresdefault.jpg)](https://youtu.be/PcZU9Aa4d_4)
+[![Watch the video](https://img.youtube.com/vi/PcZU9Aa4d_4/0.jpg)](https://youtu.be/PcZU9Aa4d_4)
 
 ## Screenshots
 
